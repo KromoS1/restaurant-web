@@ -1,29 +1,15 @@
 'use client'
 
-import { useDeleteGuestMutation } from '@/api/guest/guest.mutate'
 import { useGuestsQuery } from '@/api/guest/guest.query'
-import { IGuest } from '@/types/guest.interface'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { createColumnsGuestTable } from './column.config'
 
 export const GuestTable = () => {
 	const { data, isLoading, error } = useGuestsQuery()
-	const { mutate: deleteGuest } = useDeleteGuestMutation()
-
-	const handleEdit = (guest: IGuest) => {
-		console.log('Редактировать гостя:', guest)
-	}
-
-	const handleDelete = async (guestId: string) => {
-		deleteGuest(guestId)
-	}
 
 	const table = useReactTable({
     data: data || [],
-    columns: createColumnsGuestTable({
-			onEdit: handleEdit,
-			onDelete: handleDelete,
-		}),
+    columns: createColumnsGuestTable(),
     getCoreRowModel: getCoreRowModel(),
   })
 
