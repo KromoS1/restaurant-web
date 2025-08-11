@@ -11,6 +11,7 @@ const defaultTable: ICreateTable = {
 	maxSeats: 0,
 	type: TableType.REGULAR,
 	description: '',
+	location: '',
 }
 
 type Props = {
@@ -51,6 +52,10 @@ export const CreateForm: FC<Props> = ({closeModal}) => {
 			<form.Field
 				name="type"
 				children={(field) => <SelectApp title="Тип столика" options={Object.values(TableType)} value={`${field.state.value}`} onChange={(e) => field.handleChange(e.target.value as TableType)} />}
+			/>
+			<form.Field
+				name="location"
+				children={(field) => <FieldApp title="Расположение" placeholder="Введите расположение столика" value={`${field.state.value}`} onChange={(e) => field.handleChange(e.target.value)} />}
 			/>
 			<form.Field
 				name="description"

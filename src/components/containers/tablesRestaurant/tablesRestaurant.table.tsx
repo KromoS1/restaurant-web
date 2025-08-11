@@ -2,7 +2,6 @@
 
 import { useDeleteTableMutation } from '@/api/table/table.mutate'
 import { useTablesQuery } from '@/api/table/table.query'
-import { ITable } from '@/types/table.interface'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { createColumnsRestaurantTable } from './column.config'
 
@@ -10,7 +9,7 @@ export const TablesRestaurant = () => {
 	const { data, isLoading, error } = useTablesQuery()
 	const { mutate: deleteTable } = useDeleteTableMutation()
 
-	const handleEdit = (table: ITable) => {}
+
 
 	const handleDelete = async (tableId:  string) => {
 		deleteTable(tableId)
@@ -19,7 +18,6 @@ export const TablesRestaurant = () => {
 	const table = useReactTable({
     data: data || [],
     columns: createColumnsRestaurantTable({
-			onEdit: handleEdit,
 			onDelete: handleDelete,
 		}),
     getCoreRowModel: getCoreRowModel(),

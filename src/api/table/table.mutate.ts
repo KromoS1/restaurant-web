@@ -1,7 +1,7 @@
 import { queryKeys } from '@/config/queryClient'
 import { TABLES_ENDPOINTS } from '@/constants/endpoints'
 import { IError } from '@/types/error.interface'
-import { ICreateTable } from '@/types/table.interface'
+import { ICreateTable, ITable } from '@/types/table.interface'
 import { toastError } from '@/utils/toast.error'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
@@ -22,6 +22,24 @@ export const useCreateTableMutation = () => {
 		},
 	})
 }
+
+export const useUpdateTableMutation = () => {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async ({ id, data }: { id: string; data: Partial<ICreateTable> }) => {
+			const { data: response } = await instance.patch<ITable>(TABLES_ENDPOINTS.TABLES_ID(id), data)
+			return response
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: queryKeys.table.all })
+		},
+		onError: (error: AxiosError<IError>) => {
+			toastError(error.response?.data)
+		},
+	})
+}
+
 export const useDeleteTableMutation = () => {
 	const queryClient = useQueryClient()
 
