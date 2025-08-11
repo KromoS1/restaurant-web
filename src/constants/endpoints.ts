@@ -1,3 +1,5 @@
+import { ReservationStatus } from '@/types/reservation.interface';
+
 export class TABLES_ENDPOINTS {
 	static readonly TABLES = "/table";
 	static readonly TABLES_ID = (id: string) => `${this.TABLES}/${id}`;
@@ -8,11 +10,7 @@ export class TABLES_ENDPOINTS {
 export class RESERVATIONS_ENDPOINTS {
 	static readonly RESERVATIONS = "/reservation";
 	static readonly RESERVATIONS_ID = (id: string) => `${this.RESERVATIONS}/${id}`;
-	static readonly RESERVATIONS_CONFIRM = (id: string) => `${this.RESERVATIONS}/status/${id}/confirm`;
-	static readonly RESERVATIONS_SEAT = (id: string) => `${this.RESERVATIONS}/status/${id}/seat`;
-	static readonly RESERVATIONS_COMPLETE = (id: string) => `${this.RESERVATIONS}/status/${id}/complete`;
-	static readonly RESERVATIONS_CANCEL = (id: string) => `${this.RESERVATIONS}/status/${id}/cancel`;
-	static readonly RESERVATIONS_NO_SHOW = (id: string) => `${this.RESERVATIONS}/status/${id}/no-show`;
+	static readonly RESERVATIONS_STATUS = (id: string, status: ReservationStatus) => `${this.RESERVATIONS}/status/${id}/${status}`;
 }
 
 export class GUESTS_ENDPOINTS {

@@ -19,12 +19,13 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
 	table: {
 		all: ['tables'] as const,
+		withReservations: ['tables', 'reservations'] as const,
 	},
 	guest: {
 		all: ['guests'] as const,
 	},
 	reservation: {
-		all: ['reservations', 'tables'] as const,
+		all: ['reservations'] as const,
 		byId: (id: string) => ['reservations', id] as const,
 	}
 }

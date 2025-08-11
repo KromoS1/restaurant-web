@@ -1,13 +1,14 @@
 'use client'
 
-import { useUpdateTablePositionMutation } from '@/api/table/table.mutate'
+import { useMaintenanceTableMutation, useUpdateTablePositionMutation } from '@/api/table/table.mutate'
 import { useTablesQuery } from '@/api/table/table.query'
 import { Modal } from '@/components/ui/modal/modal'
 import { useBoolean } from '@/hooks/useBoolean'
-import { ITable, TableStatus, TableType } from '@/types/table.interface'
+import { ITableWithRelations, TableStatus, TableType } from '@/types/table.interface'
 import dynamic from 'next/dynamic'
 import React, { useEffect, useRef, useState } from 'react'
 import { ReservationForm } from '../reservationForm/reservationForm'
+import { ReservationStatusModal } from '../reservationStatusModal/reservationStatusModal'
 
 const NativeCanvas = dynamic(
   () => import('./NativeCanvas').then((mod) => ({ default: mod.NativeCanvas })),
@@ -24,10 +25,20 @@ const NativeCanvas = dynamic(
 export const RestaurantLayout: React.FC = () => {
   const { data: tables, isLoading, error } = useTablesQuery()
   const updateTablePositionMutation = useUpdateTablePositionMutation()
-  const [selectedTable, setSelectedTable] = useState<ITable | null>(null)
+  const maintenanceTableMutation = useMaintenanceTableMutation()
+
+  const [selectedTable, setSelectedTable] = useState<ITableWithRelations | null>(null)
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 })
   const containerRef = useRef<HTMLDivElement>(null)
+
   const { value: isReservationModalOpen, setTrue: openReservationModal, setFalse: closeReservationModal } = useBoolean()
+  const { value: isStatusModalOpen, setTrue: openStatusModal, setFalse: closeStatusModal } = useBoolean()
+
+  useEffect(() => {
+    if (selectedTable) {
+      setSelectedTable(tables?.find(table => table.id === selectedTable.id) || null)
+    }
+  }, [tables])  
 
   useEffect(() => {
     const updateSize = () => {
@@ -75,7 +86,7 @@ export const RestaurantLayout: React.FC = () => {
     }
   }, [])
 
-  const handleTableSelect = (table: ITable | null) => {
+  const handleTableSelect = (table: ITableWithRelations | null) => {
     setSelectedTable(table)
   }
 
@@ -94,6 +105,19 @@ export const RestaurantLayout: React.FC = () => {
 
   const handleReservationCancel = () => {
     closeReservationModal()
+  }
+
+  const toggleMaintenanceMode = () => {
+    if (!selectedTable) return
+
+    const newStatus = selectedTable.status === TableStatus.MAINTENANCE 
+      ? TableStatus.AVAILABLE 
+      : TableStatus.MAINTENANCE
+
+    maintenanceTableMutation.mutate({
+      tableId: selectedTable.id,
+      status: newStatus
+    })
   }
 
   if (isLoading) {
@@ -201,14 +225,40 @@ export const RestaurantLayout: React.FC = () => {
                 )}
               </div>
               
-              {selectedTable.status === TableStatus.AVAILABLE && (
+              <div className="space-y-2 mt-4">
+                {selectedTable.status === TableStatus.AVAILABLE && (
+                  <button 
+                    onClick={openReservationModal}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  >
+                    Забронировать столик
+                  </button>
+                )}
+                
                 <button 
-                  onClick={openReservationModal}
-                  className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  onClick={toggleMaintenanceMode}
+                  disabled={maintenanceTableMutation.isPending}
+                  className={`w-full py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                    selectedTable.status === TableStatus.MAINTENANCE
+                      ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white'
+                      : 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500 text-white'
+                  } ${maintenanceTableMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Забронировать столик
+                  {maintenanceTableMutation.isPending 
+                    ? 'Обновление...' 
+                    : selectedTable.status === TableStatus.MAINTENANCE 
+                      ? 'Завершить обслуживание' 
+                      : 'Начать обслуживание (уборка)'
+                  }
                 </button>
-              )}
+                
+                <button 
+                  onClick={openStatusModal}
+                  className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                >
+                  Управление резервированиями
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -227,6 +277,14 @@ export const RestaurantLayout: React.FC = () => {
             onCancel={handleReservationCancel}
           />
         </Modal>
+      )}
+
+      {selectedTable && (
+        <ReservationStatusModal
+          isOpen={isStatusModalOpen}
+          onClose={closeStatusModal}
+          table={selectedTable}
+        />
       )}
     </div>
   )
