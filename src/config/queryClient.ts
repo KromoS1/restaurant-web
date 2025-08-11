@@ -22,5 +22,9 @@ export const queryKeys = {
 	},
 	guest: {
 		all: ['guests'] as const,
+	},
+	reservation: {
+		all: ['reservations', 'tables'] as const,
+		byId: (id: string) => ['reservations', id] as const,
 	}
 }

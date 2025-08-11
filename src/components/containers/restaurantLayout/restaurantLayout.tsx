@@ -2,9 +2,12 @@
 
 import { useUpdateTablePositionMutation } from '@/api/table/table.mutate'
 import { useTablesQuery } from '@/api/table/table.query'
+import { Modal } from '@/components/ui/modal/modal'
+import { useBoolean } from '@/hooks/useBoolean'
 import { ITable, TableStatus, TableType } from '@/types/table.interface'
 import dynamic from 'next/dynamic'
 import React, { useEffect, useRef, useState } from 'react'
+import { ReservationForm } from '../reservationForm/reservationForm'
 
 const NativeCanvas = dynamic(
   () => import('./NativeCanvas').then((mod) => ({ default: mod.NativeCanvas })),
@@ -24,6 +27,7 @@ export const RestaurantLayout: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState<ITable | null>(null)
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const { value: isReservationModalOpen, setTrue: openReservationModal, setFalse: closeReservationModal } = useBoolean()
 
   useEffect(() => {
     const updateSize = () => {
@@ -81,6 +85,15 @@ export const RestaurantLayout: React.FC = () => {
       positionX: x,
       positionY: y
     })
+  }
+
+  const handleReservationSuccess = () => {
+    closeReservationModal()
+    setSelectedTable(null)
+  }
+
+  const handleReservationCancel = () => {
+    closeReservationModal()
   }
 
   if (isLoading) {
@@ -189,7 +202,10 @@ export const RestaurantLayout: React.FC = () => {
               </div>
               
               {selectedTable.status === TableStatus.AVAILABLE && (
-                <button className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                <button 
+                  onClick={openReservationModal}
+                  className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                >
                   Забронировать столик
                 </button>
               )}
@@ -197,6 +213,21 @@ export const RestaurantLayout: React.FC = () => {
           )}
         </div>
       </div>
+
+      {selectedTable && isReservationModalOpen && (
+        <Modal
+          isOpen={isReservationModalOpen}
+          onClose={closeReservationModal}
+          title={`Бронирование столика #${selectedTable.number}`}
+          size="lg"
+        >
+          <ReservationForm
+            table={selectedTable}
+            onSuccess={handleReservationSuccess}
+            onCancel={handleReservationCancel}
+          />
+        </Modal>
+      )}
     </div>
   )
 }

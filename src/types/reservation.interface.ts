@@ -1,5 +1,3 @@
-import { IGuest } from './guest.interface';
-import { ITable } from './table.interface';
 
 export enum ReservationStatus {
   PENDING = 'PENDING',
@@ -24,7 +22,4 @@ export interface IReservation {
   updatedAt: Date;
 }
 
-export interface IReservationWithRelations extends IReservation {
-  guest?: IGuest;
-  table?: ITable;
-}
+export interface ICreateReservation extends Omit<IReservation, 'id' | 'status' | 'createdAt' | 'updatedAt'> {}
