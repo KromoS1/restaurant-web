@@ -1,56 +1,33 @@
-import { ITable, TableStatus } from '@/types/table.interface'
+import { IGuest } from '@/types/guest.interface'
 import { createColumnHelper } from '@tanstack/react-table'
 
-const columnHelper = createColumnHelper<ITable>()
+const columnHelper = createColumnHelper<IGuest>()
 
 interface ActionsProps {
-  onEdit?: (table: ITable) => void
-  onDelete?: (tableId: string) => void
+  onEdit?: (guest: IGuest) => void
+  onDelete?: (guestId: string) => void
 }
 
-const getBadgeClass = (status: TableStatus) => {
-	switch (status) {
-		case TableStatus.AVAILABLE:
-			return 'badge badge-success'
-		case TableStatus.OCCUPIED:
-			return 'badge badge-error'
-		case TableStatus.RESERVED:
-			return 'badge badge-warning'
-		case TableStatus.MAINTENANCE:
-			return 'badge badge-primary'
-	}
-}
-
-export const createColumnsRestaurantTable = (actions?: ActionsProps) => [
-  columnHelper.accessor('number', {
-    header: 'Номер Столика',
+export const createColumnsGuestTable = (actions?: ActionsProps) => [
+  columnHelper.accessor('name', {
+    header: 'Имя',
     cell: info => info.getValue(),
   }),
-  columnHelper.accessor(row => row.minSeats, {
-    id: 'minSeats',
-    cell: info => <i>{info.getValue()}</i>,
-    header: () => <span>Мин. мест</span>,
+  columnHelper.accessor('phone', {
+    header: 'Телефон',
+    cell: info => info.getValue(),
   }),
-  columnHelper.accessor('maxSeats', {
-    header: () => 'Макс. мест',
-    cell: info => info.renderValue(),
+  columnHelper.accessor('email', {
+    header: 'Email',
+    cell: info => info.getValue() || '—',
   }),
-  columnHelper.accessor('type', {
-    header: () => <span>Тип</span>,
+  columnHelper.accessor('notes', {
+    header: 'Заметки',
+    cell: info => info.getValue() || '—',
   }),
-  columnHelper.accessor('status', {
-    header: 'Статус',
-    cell: info => {
-      const status = info.getValue()
-      
-      return <span className={getBadgeClass(status)}>{status}</span>
-    },
-  }),
-  columnHelper.accessor('location', {
-    header: 'Расположение',
-  }),
-	columnHelper.accessor('description', {
-    header: 'Описание',
+  columnHelper.accessor('createdAt', {
+    header: 'Дата создания',
+    cell: info => new Date(info.getValue()).toLocaleDateString('ru-RU'),
   }),
   columnHelper.display({
     id: 'actions',

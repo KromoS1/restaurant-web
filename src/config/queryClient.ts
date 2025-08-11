@@ -19,5 +19,8 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
 	table: {
 		all: ['tables'] as const,
+	},
+	guest: {
+		all: ['guests'] as const,
 	}
 }

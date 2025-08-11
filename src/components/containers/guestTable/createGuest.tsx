@@ -1,22 +1,22 @@
 'use client'
 
 import { useBoolean } from '@/hooks/useBoolean'
-import { CreateForm } from './createForm'
+import { CreateGuestForm } from './createGuestForm'
 
-export const CreateTable = () => {
+export const CreateGuest = () => {
 	const {value, setTrue, setFalse} = useBoolean()
 
-	return ( 
+	return (
 		<>
 			<button className="btn btn-primary" onClick={setTrue}>
-				Добавить стол
+				Добавить гостя
 			</button>
 
 			{value && (
 				<dialog className="modal modal-open">
 					<div className="modal-box">
-					<h3 className="font-bold text-lg">Добавить стол</h3>
-					<CreateForm closeModal={setFalse}/>
+						<h3 className="font-bold text-lg mb-4">Добавить нового гостя</h3>
+						<CreateGuestForm closeModal={setFalse} />
 						<div className="modal-action">
 							<button 
 								className="btn btn-ghost" 
