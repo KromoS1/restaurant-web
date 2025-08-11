@@ -1,11 +1,14 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default;
+  root: ":root";
+  darkMode: "class";
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
-
 
 body {
   background: var(--background);

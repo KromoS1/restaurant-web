@@ -1,5 +1,7 @@
 import { Header } from '@/components/containers/header/header';
+import { TanstackQueryProvider } from '@/providers/tanstackQuery.provider';
 import type { Metadata } from "next";
+import { Bounce, ToastContainer } from 'react-toastify';
 import "./globals.css";
 
 
@@ -15,11 +17,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Header />
-        <div className="mt-16 w-[100dvw] h-[calc(100dvh-64px)]">
-          {children}
-        </div>
+      <body cz-shortcut-listen="true">
+      <ToastContainer position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}/>
+        <TanstackQueryProvider>
+          <Header />
+          <div className="mt-16 w-[100dvw] h-[calc(100dvh-64px)]">
+            {children}
+          </div>
+        </TanstackQueryProvider>
       </body>
     </html>
   );
