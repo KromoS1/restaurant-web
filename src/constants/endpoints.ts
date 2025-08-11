@@ -1,4 +1,3 @@
-import { ReservationStatus } from '@/types/reservation.interface';
 
 export class TABLES_ENDPOINTS {
 	static readonly TABLES = "/table";
@@ -10,7 +9,7 @@ export class TABLES_ENDPOINTS {
 export class RESERVATIONS_ENDPOINTS {
 	static readonly RESERVATIONS = "/reservation";
 	static readonly RESERVATIONS_ID = (id: string) => `${this.RESERVATIONS}/${id}`;
-	static readonly RESERVATIONS_STATUS = (id: string, status: ReservationStatus) => `${this.RESERVATIONS}/status/${id}/${status}`;
+	static readonly RESERVATIONS_STATUS = (id: string, path: string) => `${this.RESERVATIONS}/status/${id}/${path}`;
 }
 
 export class GUESTS_ENDPOINTS {

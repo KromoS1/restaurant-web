@@ -30,8 +30,8 @@ export const useChangeStatusReservationMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({id, status}: {id: string, status: ReservationStatus}) => {
-      const { data } = await instance.patch<IReservation>(RESERVATIONS_ENDPOINTS.RESERVATIONS_STATUS(id, status))
+    mutationFn: async ({id, path}: {id: string, path: string}) => {
+      const { data } = await instance.patch<IReservation>(RESERVATIONS_ENDPOINTS.RESERVATIONS_STATUS(id, path))
       return data
     },
     onSuccess: () => {

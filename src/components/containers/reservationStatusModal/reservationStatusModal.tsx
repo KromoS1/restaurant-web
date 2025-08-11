@@ -63,22 +63,25 @@ export const ReservationStatusModal: React.FC<ReservationStatusModalProps> = ({
 
   const handleStatusChange = async (reservationId: string, action: ReservationStatus) => {
     try {
-      await mutateAsync({ id: reservationId, status: action })
-
       switch (action) {
         case ReservationStatus.CONFIRMED:
+          await mutateAsync({ id: reservationId, path: 'confirm' })
           toast.success('Резервирование подтверждено')
           break
         case ReservationStatus.SEATED:
+          await mutateAsync({ id: reservationId, path: 'seat' })
           toast.success('Гости размещены')
           break
         case ReservationStatus.COMPLETED:
+          await mutateAsync({ id: reservationId, path: 'complete' })
           toast.success('Резервирование завершено')
           break
         case ReservationStatus.CANCELLED:
+          await mutateAsync({ id: reservationId, path: 'cancel' })
           toast.success('Резервирование отменено')
           break
         case ReservationStatus.NO_SHOW:
+          await mutateAsync({ id: reservationId, path: 'no-show' })
           toast.success('Отмечено как неявка')
           break
       }
