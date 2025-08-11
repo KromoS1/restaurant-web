@@ -51,8 +51,12 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
   const { value: isDragging, setTrue: startDragging, setFalse: stopDragging } = useBoolean()
   const [dragTable, setDragTable] = useState<ITable | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
 
   const getTablePosition = (table: ITable): TablePosition => {
+
     if (table.positionX !== undefined && table.positionY !== undefined) {
       return {
         x: table.positionX,
@@ -65,7 +69,21 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
     }
     
     const defaultPos = defaultTablePositions[table.number]
-    return defaultPos || { x: 100, y: 100, shape: 'circle', radius: 40 }
+    if (defaultPos) {
+      return defaultPos
+    }
+    
+
+    const baseX = 200
+    const baseY = 150
+    const offset = (table.number - 11) * 60 
+    
+    return {
+      x: baseX + offset,
+      y: baseY,
+      shape: 'circle',
+      radius: 40
+    }
   }
 
   const getTableColor = (table: ITable, isSelected: boolean) => {
@@ -136,10 +154,11 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
   ) => {
     const color = getTypeColor(table, isSelected)
     const isDraggingThis = isDragging && dragTable?.id === table.id
+    const isNewTable = table.positionX === undefined || table.positionY === undefined
     
     ctx.fillStyle = color
-    ctx.strokeStyle = isSelected ? '#1D4ED8' : '#374151'
-    ctx.lineWidth = isSelected ? 3 : 1
+    ctx.strokeStyle = isSelected ? '#1D4ED8' : isNewTable ? '#F59E0B' : '#374151'
+    ctx.lineWidth = isSelected ? 3 : isNewTable ? 2 : 1
     
     if (isDraggingThis) {
       ctx.globalAlpha = 0.7
@@ -218,19 +237,32 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
     ctx.fillStyle = '#F9FAFB'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+    ctx.save()
+    ctx.translate(canvasOffset.x, canvasOffset.y)
+
+    console.log('Отрисовываем столиков:', tablesData.length)
     tablesData.forEach(({ table, position }) => {
+      console.log(`Рисуем столик #${table.number} на позиции (${position.x}, ${position.y})`)
       const isSelected = selectedTable?.id === table.id
       drawTable(ctx, table, position, isSelected)
     })
-  }, [tablesData, selectedTable, stageSize])
+
+    ctx.restore()
+  }, [tablesData, selectedTable, stageSize, canvasOffset])
 
   const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+    const x = event.clientX - rect.left - canvasOffset.x
+    const y = event.clientY - rect.top - canvasOffset.y
+
+    if (event.button === 2) {
+      setIsPanning(true)
+      setPanStart({ x: event.clientX, y: event.clientY })
+      return
+    }
 
     for (const { table, position } of tablesData) {
       if (isPointInTable(x, y, position)) {
@@ -250,14 +282,25 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isPanning) {
+      const deltaX = event.clientX - panStart.x
+      const deltaY = event.clientY - panStart.y
+      setCanvasOffset(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }))
+      setPanStart({ x: event.clientX, y: event.clientY })
+      return
+    }
+
     if (!isDragging || !dragTable) return
 
     const canvas = canvasRef.current
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+    const x = event.clientX - rect.left - canvasOffset.x
+    const y = event.clientY - rect.top - canvasOffset.y
 
     const newX = x - dragOffset.x
     const newY = y - dragOffset.y
@@ -275,6 +318,10 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
   }
 
   const handleMouseUp = () => {
+    if (isPanning) {
+      setIsPanning(false)
+    }
+
     if (isDragging && dragTable && onTableMove) {
       const tableData = tablesData.find(td => td.table.id === dragTable.id)
       if (tableData) {
@@ -288,14 +335,18 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
   }
 
   useEffect(() => {
+    console.log('NativeCanvas: получено столиков:', tables.length)
+    console.log('NativeCanvas: список столиков:', tables.map(t => `#${t.number} (${t.id})`))
+    
     const newTablesData: TableData[] = tables
       .map((table) => {
         const position = getTablePosition(table)
+        console.log(`Столик #${table.number}: позиция (${position.x}, ${position.y})`)
         return { table, position }
       })
 
     setTablesData(newTablesData)
-  }, [tables])
+  }, [tables, stageSize])
 
   useEffect(() => {
     draw()
@@ -319,8 +370,9 @@ export const NativeCanvas: React.FC<NativeCanvasProps> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onContextMenu={(e) => e.preventDefault()}
       style={{
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isPanning ? 'move' : isDragging ? 'grabbing' : 'grab',
         display: 'block',
         width: '100%',
         height: '100%',

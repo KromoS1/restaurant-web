@@ -84,7 +84,11 @@ export const EditTableForm: FC<Props> = ({ table, closeModal }) => {
 				children={(field) => (
 					<SelectApp 
 						title="Тип столика" 
-						options={Object.values(TableType)} 
+						options={[
+							{ value: TableType.REGULAR, label: 'Обычный' },
+							{ value: TableType.VIP, label: 'VIP' },
+							{ value: TableType.FAMILY, label: 'Семейный' }
+						]} 
 						value={`${field.state.value}`} 
 						onChange={(e) => field.handleChange(e.target.value as TableType)} 
 					/>

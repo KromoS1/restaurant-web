@@ -51,7 +51,16 @@ export const CreateForm: FC<Props> = ({closeModal}) => {
 			/>
 			<form.Field
 				name="type"
-				children={(field) => <SelectApp title="Тип столика" options={Object.values(TableType)} value={`${field.state.value}`} onChange={(e) => field.handleChange(e.target.value as TableType)} />}
+				children={(field) => <SelectApp 
+					title="Тип столика" 
+					options={[
+						{ value: TableType.REGULAR, label: 'Обычный' },
+						{ value: TableType.VIP, label: 'VIP' },
+						{ value: TableType.FAMILY, label: 'Семейный' }
+					]} 
+					value={`${field.state.value}`} 
+					onChange={(e) => field.handleChange(e.target.value as TableType)} 
+				/>}
 			/>
 			<form.Field
 				name="location"

@@ -28,6 +28,18 @@ export const RestaurantLayout: React.FC = () => {
   const maintenanceTableMutation = useMaintenanceTableMutation()
 
   const [selectedTable, setSelectedTable] = useState<ITableWithRelations | null>(null)
+
+  React.useEffect(() => {
+    if (tables) {
+      console.log('Загруженные столики:', tables)
+      const table120 = tables.find(t => t.number === 120)
+      if (table120) {
+        console.log('Столик 120 найден:', table120)
+      } else {
+        console.log('Столик 120 не найден. Все номера столиков:', tables.map(t => t.number))
+      }
+    }
+  }, [tables])
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 })
   const containerRef = useRef<HTMLDivElement>(null)
 

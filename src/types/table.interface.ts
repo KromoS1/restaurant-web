@@ -36,7 +36,7 @@ export interface ITable {
   updatedAt: Date;
 }
 
-export interface ICreateTable extends Omit<ITable, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface ICreateTable extends Omit<ITable, 'id' | 'createdAt' | 'updatedAt' | 'status'> {}
 
 export interface ITableWithRelations extends ITable {
   reservations?: IReservation[];
