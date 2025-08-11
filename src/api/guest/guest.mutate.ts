@@ -1,15 +1,8 @@
 import { queryKeys } from '@/config/queryClient'
 import { GUESTS_ENDPOINTS } from '@/constants/endpoints'
-import { IGuest } from '@/types/guest.interface'
+import { ICreateGuest, IGuest } from '@/types/guest.interface'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { instance } from '../instance'
-
-export interface ICreateGuest {
-  name: string
-  phone: string
-  email?: string
-  notes?: string
-}
 
 export const useCreateGuestMutation = () => {
   const queryClient = useQueryClient()
@@ -30,7 +23,7 @@ export const useDeleteGuestMutation = () => {
   
   return useMutation({
     mutationFn: async (guestId: string) => {
-      await instance.delete(`${GUESTS_ENDPOINTS.GUESTS}/${guestId}`)
+      await instance.delete(GUESTS_ENDPOINTS.GUESTS_ID(guestId))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.guest.all })

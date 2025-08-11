@@ -10,6 +10,13 @@ export interface IGuest {
   updatedAt: Date;
 }
 
+export interface ICreateGuest {
+  name: string
+  phone: string
+  email?: string
+  notes?: string
+}
+
 export interface IGuestWithRelations extends IGuest {
   reservations?: IReservation[];
 }

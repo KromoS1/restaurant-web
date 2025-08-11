@@ -17,6 +17,7 @@ export class RESERVATIONS_ENDPOINTS {
 
 export class GUESTS_ENDPOINTS {
 	static readonly GUESTS = "/guest";
+	static readonly GUESTS_ID = (id: string) => `/${this.GUESTS}/${id}`;
 }
 
 export class WALK_IN_ENDPOINTS {
