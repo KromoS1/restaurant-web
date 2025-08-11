@@ -40,6 +40,26 @@ export const useUpdateTableMutation = () => {
 	})
 }
 
+export const useUpdateTablePositionMutation = () => {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationFn: async ({ id, positionX, positionY }: { id: string; positionX: number; positionY: number }) => {
+			const { data: response } = await instance.patch<ITable>(TABLES_ENDPOINTS.TABLES_ID(id), {
+				positionX,
+				positionY
+			})
+			return response
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: queryKeys.table.all })
+		},
+		onError: (error: AxiosError<IError>) => {
+			console.error('Ошибка при обновлении позиции столика:', error)
+		},
+	})
+}
+
 export const useDeleteTableMutation = () => {
 	const queryClient = useQueryClient()
 

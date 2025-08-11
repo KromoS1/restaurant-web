@@ -31,7 +31,7 @@ export default function RootLayout({
         transition={Bounce}/>
         <TanstackQueryProvider>
           <Header />
-          <div className="mt-16 w-[100dvw] h-[calc(100dvh-64px)]">
+          <div className="mt-16 w-full h-[calc(100dvh-64px)] overflow-hidden">
             {children}
           </div>
         </TanstackQueryProvider>

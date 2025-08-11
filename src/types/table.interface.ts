@@ -24,18 +24,19 @@ export interface ITable {
   status: TableStatus;
   location?: string;
   description?: string;
+  
+  positionX?: number;
+  positionY?: number;
+  shape?: 'circle' | 'rect' | 'ellipse';
+  width?: number;
+  height?: number;
+  radius?: number;
+  
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ICreateTable {
-  number: number;
-  minSeats: number;
-  maxSeats: number;
-  type: TableType;
-  location?: string;
-  description?: string;
-}
+export interface ICreateTable extends Omit<ITable, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export interface ITableWithRelations extends ITable {
   reservations?: IReservation[];

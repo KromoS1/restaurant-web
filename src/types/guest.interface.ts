@@ -10,12 +10,7 @@ export interface IGuest {
   updatedAt: Date;
 }
 
-export interface ICreateGuest {
-  name: string
-  phone: string
-  email?: string
-  notes?: string
-}
+export interface ICreateGuest extends Omit<IGuest, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export interface IGuestWithRelations extends IGuest {
   reservations?: IReservation[];

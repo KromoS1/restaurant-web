@@ -1,5 +1,5 @@
 export const PAGES = {
-	RESERVATIONS: "/",
+	HOME: "/",
 	TABLES: "/tables",
 	GUESTS: "/guests",
 }
